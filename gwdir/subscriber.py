@@ -1,4 +1,4 @@
-import mqcutils
+import mqutils
 import pika
 
 class Subscriber:

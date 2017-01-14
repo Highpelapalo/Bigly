@@ -39,7 +39,7 @@ def default_handler(mqc):
 
 class Channel:
     def __init__(self, channel):
-        sekf.channel = channel
+        self.channel = channel
 
     def close(self):
         self.channel.close()
@@ -76,27 +76,51 @@ class MQC:
     def channel(self, add=True):
         channel = Channel(self.connection.channel())
         if add:
-            self.channels.add(channel)
+            self.channels.append(channel)
 
 
     @connection_state(default_handler)
     def exchange_declare(self, channel, name, exchange_type):
-        channel.channel.exchange_decalre(exchange=name, type=exchange_type)
-        self.channels.add((name, exchange_type))
+        try:
+            channel.channel.exchange_decalre(exchange=name, type=exchange_type)
+            self.channels.add((name, exchange_type))
+            return name
+        except:
+            self.connect(wait=True)
+            #exchange_declare(self, channel, name, exchange_type)
 
-    @connection_state
+    @connection_state(default_handler)
     def publish(self, channel, exchange, key, message):
-        channel.channel.basic_publish(exchange=exchange, routing_key=key, message=message)
+        try:
+            channel.channel.basic_publish(exchange=exchange, routing_key=key, message=message)
+        except:
+            self.connect(wait=True)
+            publish(self, channel, exchange, key, message)
+            
 
-    @connection_state
-    def queue_declare(self, channel, **kwds):
-        res = channel.channel.queue.declare(**kwds)
-        self.queues[res.method.queue] = None
+    @connection_state(default_handler)
+    def queue_declare(self, channel, name):
+        try:
+            res = channel.channel.queue_declare(queue=name, exclusive=True)
+            self.queues[res.method.queue] = None
+            return res.method.queue
+        except:
+            self.connect(wait=True)
+            #queue_declare(self, channel, **kwds)
 
-    @connection_state        
+    @connection_state(default_handler)
     def queue_bind(self, channel, exchange, queue, key):
-        channel.channel.queue_bind(exchange=exchange, queue=queue, routing_key=key)
-        self.queues[queue] = (exchange, key)
+        try:
+            channel.channel.queue_bind(exchange=exchange, queue=queue, routing_key=key)
+            self.queues[queue] = (exchange, key)
+        except:
+            self.connect(wait=True)
+            #queue_bind(self, channel, exchange, queue, key)
 
+    @connection_state(default_handler)
     def consume(self, channel, callback, queue, **kwds):
-        channel.basic_consume(callback, queue=queue, **kwds)
+        try:
+            channel.basic_consume(callback, queue=queue, **kwds)
+        except:
+            self.connect(wait=True)
+            consume(self, channel, callback, queue, **kwds)

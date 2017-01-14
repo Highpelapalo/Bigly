@@ -15,9 +15,9 @@ GW_URL=None
 
 
 def tag1():
-    return {'coolness':6}
+    return {'command':'tag1', 'coolness':6}
 def tag2():
-    return {'coolness':7}
+    return {'command':'tag2', 'coolness':7}
     
 
 def test_request():
@@ -44,15 +44,18 @@ def run():
         print(data)
         command = data['command']
         if command == 'tag1':
+            print("Sending finish")
             r = requests
             r = requests.post(GW_URL.finish_url(), get_data(str(tag1())))
         elif command == 'tag2':
             r = requests
-            r = requests.post(GW_URL.finish.url(), get_data(str(tag1())))
+            r = requests.post(GW_URL.finish_url(), get_data(str(tag2())))
         elif command == 'sleep':
             time.sleep(data['time'])
         elif command == 'exit':
             break
+        else:
+            print("Bug")
 
 if __name__ == '__main__':
     GW_URL = URL()
