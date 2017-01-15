@@ -2,35 +2,26 @@ version: '2'
 
 services:
     mq:
-        build:
-            context: .
-            dockerfile: MQdockerfile
+        image: rabbitmq
     gw:
         build:
-            context: .
-            dockerfile: GWdockerfile
+            context: gw
+            dockerfile: Dockerfile
         ports:
             - 80:8000
         links:
             - mq
     cl:
         build:
-            context: .
-            dockerfile: CLdockerfile
-        links:
-            - mq
-            - gw
-    cl2:
-        build:
-            context: .
-            dockerfile: CL2dockerfile
+            context: client
+            dockerfile: Dockerfile
         links:
             - mq
             - gw
     sr:
         build:
-            context: .
-            dockerfile: SRdockerfile
+            context: saver
+            dockerfile: Dockerfile
         links:
             - mq
         ports:

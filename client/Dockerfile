@@ -3,8 +3,8 @@ RUN apt-get -y update
 RUN apt-get -y install python3
 RUN apt-get -y install python3-pip
 RUN apt-get -y install python3-dev
-COPY CLrequire.txt /tmp/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install -r /tmp/requirements.txt
-COPY clientdir /cldir
-WORKDIR cldir
-CMD python3 -um client gw cool_312
+COPY . /client
+WORKDIR client
+CMD python3 -um client gw
