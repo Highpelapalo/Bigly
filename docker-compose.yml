@@ -5,8 +5,8 @@ services:
         image: rabbitmq
     gw:
         build:
-            context: gw
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: gw/Dockerfile
         ports:
             - 80:8000
         links:
