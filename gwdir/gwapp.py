@@ -11,14 +11,6 @@ mqc = None
 
 commands.import_plugins()
 
-class Connection:
-    def __init__(self, name):
-        self.name = name
-        self.pending = []
-
-    def add_pending(command):
-        self.pending.append(command)
-
 connections = {}
 
 publish_worker = None
@@ -35,16 +27,21 @@ def connection():
     global connections
     name = request.form['name']
     version = request.form['version']
+
     print('Connect request from {name}'.format(name=name))
+
     publish_worker.publish('client_logs', 'Connect request from {name}'.format(name=name))
+    
     if name in connections.keys():
         try:
             pending = connections[name][0]
             return handle_command(name, pending)
         except:
             return jsonify({'command':'sleep', 'time':5})
+    
     tags = commands.run_matchers(commands.Data(name=name)) 
     connections[name] = []
+    
     for tag in tags:
         com = commands.commands[tag](commands.Data(name=name))
         connections[name].append(tag)
@@ -56,11 +53,14 @@ def diconnect():
     name = request.form['name']
     data = request.form['data']
     data = ast.literal_eval(data)
+
     command = data['command']
     print('Finish request from {name} - {data}'.format(name=name, data=data))
+    
     publish_worker.publish('client_product', str({'name':name, 'data':data}))
     react = commands.run_reactor(command, commands.Data(**data))
     connections[name].insert(0,react)
+    
     if react:
         return jsonify({'command':'come'})
     else:

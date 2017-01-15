@@ -13,7 +13,6 @@ version='0.1.8'
 
 GW_URL=None
 
-
 def tag1():
     return {'command':'tag1', 'coolness':6}
 def tag2():
@@ -61,6 +60,4 @@ if __name__ == '__main__':
     global GW_URL
     GW_URL = URL(host=host)
     print('Working with GW {gw}'.format(gw=GW_URL.host))
-    time.sleep(2)
-    
     run()
