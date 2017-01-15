@@ -1,6 +1,7 @@
 import mqutils
 import pika
 
+### TODO ###
 class Subscriber:
     def __init__(self, mqc, callback):
         self.mqc = mqc

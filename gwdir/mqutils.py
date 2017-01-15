@@ -87,7 +87,7 @@ class MQC:
             return name
         except:
             self.connect(wait=True)
-            #exchange_declare(self, channel, name, exchange_type)
+            #self.exchange_declare(channel, name, exchange_type)
 
     @connection_state(default_handler)
     def publish(self, channel, exchange, key, message):
@@ -95,7 +95,7 @@ class MQC:
             channel.channel.basic_publish(exchange=exchange, routing_key=key, message=message)
         except:
             self.connect(wait=True)
-            publish(self, channel, exchange, key, message)
+            #self.publish(channel, exchange, key, message)
             
 
     @connection_state(default_handler)
@@ -106,7 +106,7 @@ class MQC:
             return res.method.queue
         except:
             self.connect(wait=True)
-            #queue_declare(self, channel, **kwds)
+            #self.queue_declare(channel, **kwds)
 
     @connection_state(default_handler)
     def queue_bind(self, channel, exchange, queue, key):
@@ -115,7 +115,7 @@ class MQC:
             self.queues[queue] = (exchange, key)
         except:
             self.connect(wait=True)
-            #queue_bind(self, channel, exchange, queue, key)
+            #self.queue_bind(channel, exchange, queue, key)
 
     @connection_state(default_handler)
     def consume(self, channel, callback, queue, **kwds):
@@ -123,4 +123,4 @@ class MQC:
             channel.basic_consume(callback, queue=queue, **kwds)
         except:
             self.connect(wait=True)
-            consume(self, channel, callback, queue, **kwds)
+            #self.consume(channel, callback, queue, **kwds)

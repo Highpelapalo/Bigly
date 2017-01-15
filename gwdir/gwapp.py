@@ -4,6 +4,7 @@ import commands
 from mqutils import MQC
 import subscriber
 import publisher
+import sys
 
 app = Flask(__name__)
 mqc = None
@@ -20,20 +21,22 @@ class Connection:
 
 connections = {}
 
-publish = None
+publish_worker = None
 
 def handle_command(name, command):
     """Gets (int, string - command tag) and return a commands json"""
+    global connections
     connections[name].remove(command)
     print(command, 'handle')
     return jsonify(commands.commands[command](commands.Data(name=name)))
 
 @app.route('/connect',methods=['POST'])
 def connection():
+    global connections
     name = request.form['name']
     version = request.form['version']
     print('Connect request from {name}'.format(name=name))
-    publish.publish('client_logs', 'Connect request from {name}'.format(name=name))
+    publish_worker.publish('client_logs', 'Connect request from {name}'.format(name=name))
     if name in connections.keys():
         try:
             pending = connections[name][0]
@@ -49,12 +52,13 @@ def connection():
 
 @app.route('/finish', methods=['POST'])
 def diconnect():
-    print("Got finish request")
+    global connections
     name = request.form['name']
     data = request.form['data']
     data = ast.literal_eval(data)
     command = data['command']
     print('Finish request from {name} - {data}'.format(name=name, data=data))
+    publish_worker.publish('client_product', str({'name':name, 'data':data}))
     react = commands.run_reactor(command, commands.Data(**data))
     connections[name].insert(0,react)
     if react:
@@ -62,11 +66,25 @@ def diconnect():
     else:
         return jsonify({'command':'sleep', 'time':5})
 
-if __name__ == "__main__":
-    mqc = MQC('172.20.0.2')
-    mqc.connect()
-    publish = publisher.Publisher(mqc, 'client_direct', 'direct')
-    queue = publish.queue_declare('client_logs')
-    publish.queue_bind(queue, 'client_logs')
+def run(host=None):
+    if not host:
+        host = '172.20.0.2'
+    global mqc
+    mqc = MQC(host)
+    mqc.connect(wait=True)
+    global publish_worker
+    publish_worker = publisher.Publisher(mqc, 'client_direct', 'direct')
+    print('Establishing connection to MQ')
+    queue = publish_worker.queue_declare('client_logs')
+    queue2 = publish_worker.queue_declare('client_product')
+    publish_worker.queue_bind(queue, 'client_logs')
+    publish_worker.queue_bind(queue2, 'client_product')
     
     app.run(host='0.0.0.0', port=8000)
+
+if __name__ == '__main__':
+    print('Starting GW')
+    if len(sys.argv) > 1:
+        run(host=sys.argv[1])
+    else:
+        run()

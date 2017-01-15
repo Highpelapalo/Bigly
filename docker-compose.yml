@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+    mq:
+        build:
+            context: .
+            dockerfile: MQdockerfile
+    gw:
+        build:
+            context: .
+            dockerfile: GWdockerfile
+        ports:
+            - 80:8000
+        links:
+            - mq
+    cl:
+        build:
+            context: .
+            dockerfile: CLdockerfile
+        links:
+            - mq
+            - gw
+    cl2:
+        build:
+            context: .
+            dockerfile: CL2dockerfile
+        links:
+            - mq
+            - gw
+    sr:
+        build:
+            context: .
+            dockerfile: SRdockerfile
+        links:
+            - mq
+        ports:
+            - 8080:8000
