@@ -1,13 +1,13 @@
 import requests
 from furl import furl
 from url import URL
-import time
+import json, time
 
 default_host = 'localhost'
 default_path = 'connect'
 default_port = 8000
 
-name='cool_123'
+name='cool_567'
 
 version='0.1.8'
 
@@ -28,23 +28,23 @@ def run():
         try:
             print('Sending request to gw {gw}'.format(gw=GW_URL.connect_url()))
             r = requests.post(GW_URL.connect_url(), data=get_data())
+            print("sent")
             data = r.json()
             print(data)
+            print("rec")
             command = data['command']
             if command == 'tag1':
                 print("Sending finish")
-                r = requests
-                r = requests.post(GW_URL.finish_url(), get_data(str(tag1())))
+                r = requests.post(GW_URL.finish_url(), data=get_data(str(tag1())))
             elif command == 'tag2':
-                r = requests
-                r = requests.post(GW_URL.finish_url(), get_data(str(tag2())))
+                r = requests.post(GW_URL.finish_url(), data=get_data(str(tag2())))
             elif command == 'sleep':
                 time.sleep(data['time'])
             elif command == 'exit':
                 break
             else:
                 print('Bug')
-        except:
+        except :
             print('Failed to connect, retrying in 2 seconds')
             time.sleep(2)
 

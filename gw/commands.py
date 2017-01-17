@@ -9,7 +9,7 @@ matchers=defaultdict(list)
 commands={}
 reactors={}
 
-PLUGINS='plugins/'
+PLUGINS_DIR='plugins/'
 
 class Config:
     def __init__(self, **kwds):
@@ -51,7 +51,7 @@ def reactor(tag):
 
 def import_plugins(path=None):
     if not path:
-        path = PLUGINS
+        path = PLUGINS_DIR
     plugin_dir = Path(path) 
     for plugin in plugin_dir.files('*_plugin.py'):
         enable_plugin(plugin)

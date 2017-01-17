@@ -1,16 +1,20 @@
 import mqutils
 import pika
 
-### TODO ###
 class Subscriber:
-    def __init__(self, mqc, callback):
+    def __init__(self, mqc, callback, exchange_name, exchange_type):
         self.mqc = mqc
         self.callback = callback
-        self.channel = mqutils.Channel(mqc.channel)
+        self.exchange = mqc.exchange_declare(exchange_name, exchange_type)
 
-    def subscribe(self, exchange, queue, **kwds):
-        self.channel = mqc.consume(self.channel, self.callback, queue=queue, **kwds)
+    def subscribe(self, queue, **kwds):
+        self.channel = self.mqc.consume(self.callback, queue=queue, **kwds)
+
+    def queue_declare(self, name):
+         return self.mqc.queue_declare(name)
+
+    def queue_bind(self, queue, key):
+        return self.mqc.queue_bind(self.exchange, queue, key)
 
     def start(self):
-        self.channel.channel.start_consuming()
-        
+        self.mqc.start_consuming()

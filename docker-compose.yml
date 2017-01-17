@@ -8,21 +8,32 @@ services:
             context: .
             dockerfile: gw/Dockerfile
         ports:
-            - 80:8000
+            - 8080:8000
         links:
             - mq
     cl:
         build:
-            context: client
-            dockerfile: Dockerfile
+            context: . 
+            dockerfile: client/Dockerfile
         links:
             - mq
             - gw
+    sr_db:
+        image: postgres
+        volumes: 
+            - '~/course/Bigly/saver/db:/var/lib/postgresql/data'
     sr:
         build:
-            context: saver
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: saver/Dockerfile
         links:
-            - mq
+            - sr_db
         ports:
-            - 8080:8000
+            - 80:8000
+    sr_ext:
+        build:
+            context: .
+            dockerfile: extractor/Dockerfile
+        links:
+            - sr
+            - mq
