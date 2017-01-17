@@ -73,7 +73,7 @@ def finish():
     data = ast.literal_eval(data)
     command = data['command']
     print('Finish request from {name} - {data}'.format(name=name, data=data))
-    mq_json = json.dumps({'name':name, 'data':data})
+    mq_json = json.dumps({"name":name, "data":data})
 
     connection.publisher.publish('client_products', str(mq_json))
     return connection.get_reactor(name, data)

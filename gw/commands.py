@@ -2,6 +2,7 @@ from collections import defaultdict
 from inspect import getmembers, isfunction
 import os, sys
 from path import Path
+import importlib
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'plugins'))
 
@@ -58,10 +59,17 @@ def import_plugins(path=None):
 
 def enable_plugin(plugin_string):
     plugin_string = plugin_string.replace('.py', '')
-    plugin = __import__(os.path.basename(plugin_string))
+    plugin = importlib.import_module(os.path.basename(plugin_string))
     function_list = [o[1] for o in getmembers(plugin) if isfunction(o[1])]
-    for func in function_list:
-        func
+
+def update(path=None):
+    global matchers
+    global commands
+    global reactors
+    matchers = defaultdict(list)
+    commands = {}
+    reactors = {}
+    import_plugins(path)
 
 def run_matcher(matcher, data):
     tag = matcher(data)

@@ -15,24 +15,23 @@ version='0.1.8'
 GW_URL=None
 
 def tag1():
-    return {'command':'tag1', 'coolness':6}
+    rand = random.randrange(1,10)
+    return {"command":"tag1", "coolness":rand}
 def tag2():
-    return {'command':'tag2', 'coolness':7}
+    rand = random.randrange(1,10)
+    return {"command":"tag2", "coolness":rand}
     
 def get_data(data=None):
     if not data:
-        data = ''
-    return {'name':name, 'version':version, 'data':data}
+        data = ""
+    return {"name":name, "version":version, "data":data}
 
 def run():
     while True:
         try:
             print('Sending request to gw {gw}'.format(gw=GW_URL.connect_url()))
             r = requests.post(GW_URL.connect_url(), data=get_data())
-            print("sent")
             data = r.json()
-            print(data)
-            print("rec")
             command = data['command']
             if command == 'tag1':
                 print("Sending finish")
