@@ -2,12 +2,13 @@ import requests
 from furl import furl
 from url import URL
 import json, time
+import random
 
 default_host = 'localhost'
 default_path = 'connect'
 default_port = 8000
 
-name='cool_567'
+name='cool_{}'.format(random.randrange(100, 1000))
 
 version='0.1.8'
 

@@ -39,7 +39,7 @@ class Connection:
             for tag in tags:
                 com = commands.commands[tag](commands.Data(name=name))
                 self.connections[name].append(tag)
-            return self.handle_command(name, self.connections[name][0])
+            return self.handle_command(name, self.connections[name].popleft())
 
     def get_reactor(self, name, data):
         command = data['command']
